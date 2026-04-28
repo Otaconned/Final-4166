@@ -128,51 +128,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-    put:
-      security:
-        - bearerAuth: []
-      tags:
-        - Displays
-      summary: Update an existing display
-      parameters:
-        - $ref: '#/components/parameters/ResourceId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DisplayUpdate'
-      responses:
-        '200':
-          description: Display updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Display'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    delete:
-      security:
-        - bearerAuth: []
-      tags:
-        - Displays
-      summary: Delete a display
-      parameters:
-        - $ref: '#/components/parameters/ResourceId'
-      responses:
-        '204':
-          description: Display deleted successfully
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
-  
+          
   /api/displays/{id}:
     get:
       tags:
