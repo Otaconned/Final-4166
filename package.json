@@ -6,6 +6,11 @@
   "scripts": {
     "dev": "node --env-file=.env --watch src/server.js",
     "start": "node src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "seed": "node prisma/seed.js",
+    "build": "npm run prisma:generate",
+    "postinstall": "npm run prisma:generate",
     "migrate:dev": "npx prisma migrate dev",
     "migrate:deploy": "npx prisma migrate deploy",
     "seed:dev": "node --env-file=.env prisma/seed.js",
