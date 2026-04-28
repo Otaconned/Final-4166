@@ -6,7 +6,7 @@ info:
   description: API documentation for managing retail displays, tracking product rotation, and facilitating communication
 
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:3000
     description: Local development server
   - url: https://final-4166.onrender.com
     description: Production server

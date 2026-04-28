@@ -20,6 +20,20 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 if (process.env.NODE_ENV !== 'test') app.use(morgan('tiny'));
 
+app.get('/', (req, res) => {
+  res.redirect('/api-docs');
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    port: PORT,
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 let specs;
 try {
   specs = yaml.load(fs.readFileSync('./docs/openapi.yaml', 'utf8'));
