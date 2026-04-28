@@ -1,0 +1,79 @@
+generator client {
+    provider = "prisma-client-js"
+    output   = "../src/generated/prisma"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model Display {
+    id Int @id @default(autoincrement())
+    name String
+    location String
+    status String @default("active")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    authorId Int @map("author_id")
+
+    author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+    items DisplayItem[]
+    comments DisplayComment[]
+
+    @@map("displays")
+}
+
+model DisplayItem {
+    id Int @id @default(autoincrement())
+    productName String @map("product_name")
+    plu String
+    quantity Int @default(1)
+    status String @default("active")
+    location String?
+    addedAt DateTime @default(now()) @map("added_at")
+    removedAt DateTime? @map("removed_at")
+    displayId Int @map("display_id")
+    authorId Int @map("author_id")
+
+    display Display @relation(fields: [displayId], references: [id], onDelete: Cascade)
+    author User @relation(fields: [authorId], references: [id])
+    comments DisplayComment[]
+
+    @@unique([displayId, plu])
+    @@map("display_items")
+}
+
+model DisplayComment {
+    id Int @id @default(autoincrement())
+    content String @db.Text
+    actionType String @default("note") @map("action_type")
+    createdAt DateTime @default(now()) @map("created_at")
+    displayId Int @map("display_id")
+    authorId Int @map("author_id")
+    displayItemId Int? @map("display_item_id")
+
+    display Display @relation(fields: [displayId], references: [id], onDelete: Cascade)
+    author User @relation(fields: [authorId], references: [id])
+    displayItem DisplayItem? @relation(fields: [displayItemId], references: [id], onDelete: SetNull)
+
+    @@map("display_comments")
+}
+
+model User {
+    id Int @id @default(autoincrement())
+    email String @unique
+    password String
+    role Role @default(EMPLOYEE)
+
+    displays Display[]
+    displayItems DisplayItem[]
+    comments DisplayComment[]
+
+    @@map("users")
+}
+
+enum Role {
+    EMPLOYEE
+    MANAGER
+    ADMIN
+}

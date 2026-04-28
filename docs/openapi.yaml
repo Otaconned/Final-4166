@@ -1,0 +1,567 @@
+openapi: 3.0.3
+
+info:
+  title: 4166 Final Project - Retail Display API
+  version: 1.0.0
+  description: API documentation for managing retail displays, tracking product rotation, and facilitating communication
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+  - url: https://api.retaildisplay.com
+    description: Production server
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Displays
+    description: Operations related to displays
+  - name: Display Items
+    description: Operations related to items on displays
+  - name: Comments
+    description: Operations related to comments on displays and items
+  - name: Auth
+    description: User authentication endpoints
+paths:
+  /api/auth/signup:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      description: Create a new user account 
+      security: []
+      requestBody:
+        description: User signup information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignup'
+            example:
+              username: 'employee@retail.com'
+              password: 'password123'
+      responses:
+        '201':
+          description: Sign up successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              example:
+                id: 1
+                email: 'employee@retail.com'
+                role: 'employee'
+                createdAt: '2024-01-01T00:00:00Z'
+        '400':
+          $ref: '#/components/responses/InvalidUserInput'
+  /api/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: User login
+      description: Authenticate a user and return a JWT token
+      security: []
+      requestBody:
+        description: User login credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthCredentials'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+              example:
+                token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        '400':
+          $ref: '#/components/responses/InvalidUserInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/displays:
+    get:
+      tags:
+        - Displays
+      summary: Get all displays
+      description: Retrieve a list of all retail displays
+      responses:
+        '200':
+          description: A list of displays
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Display'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags:
+        - Displays
+      summary: Create a new display
+      description: Add a new retail display
+      requestBody:
+        description: Display information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisplayCreate'
+      responses:
+        '201':
+          description: Display created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Display'
+        '400':
+          $ref: '#/components/responses/InvalidUserInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Displays
+      summary: Update an existing display
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisplayUpdate'
+      responses:
+        '200':
+          description: Display updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Display'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Displays
+      summary: Delete a display
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '204':
+          description: Display deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  
+  /api/displays/{id}:
+    get:
+      tags:
+        - Displays
+      summary: Get display details
+      description: Retrieve detailed information about a specific display
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Display details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Display'
+        '400':
+          $ref: '#/components/responses/InvalidUserInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Displays
+      summary: Update display details
+      description: Update information for a specific display
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisplayUpdate'
+      responses:
+        '200':
+          description: Display updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Display'
+        '400':
+          $ref: '#/components/responses/InvalidUserInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Displays
+      summary: Delete a display
+      description: Remove a specific display from the system
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '204':
+          description: Display deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/display-items:
+    get:
+      tags:
+        - Display Items
+      summary: Get all display items
+      description: Retrieve a list of all items on display
+      parameters:
+        - name: displayId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: ['active', 'out_of_stock', 'archived']
+      responses:
+        '200':
+          description: A list of display items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DisplayItem'
+    post:
+      tags:
+        - Display Items
+      summary: Create a new display item
+      description: Add a new item to a display
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisplayItemCreate'
+      responses:
+        '201':
+          description: Display item created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisplayItem'
+        '400':
+          $ref: '#/components/responses/InvalidUserInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/display-items/{id}:
+    get:
+      tags:
+        - Display Items
+      summary: Get display item details
+      description: Retrieve detailed information about a specific display item
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Display item details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisplayItem'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Display Items
+      summary: Update display item details
+      description: Update information for a specific display item
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DisplayItemUpdate'
+      responses:
+        '200':
+          description: Display item updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisplayItem'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - Display Items
+      summary: Delete a display item
+      description: Remove a specific item from a display
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '204':
+          description: Display item deleted successfully
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/comments:
+    get:
+      tags:
+        - Comments
+      summary: Get comments
+      parameters:
+        - name: displayId
+          in: query
+          schema:
+            type: integer
+        - name: displayItemId
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+    post:
+      tags:
+        - Comments
+      summary: Add a comment
+      description: Add a comment to a display or display item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+      responses:
+        '201':
+          description: Comment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  
+  /api/comments/{id}:
+    put:
+      tags:
+        - Comments
+      summary: Update a comment
+      description: Edit the content of a specific comment
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+      responses:
+        '200':
+          description: Comment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags:
+        - Comments
+      summary: Delete a comment
+      description: Remove a specific comment from a display or display item
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '204':
+          description: Comment deleted successfully
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+        role:
+          type: string
+          enum: ['admin', 'manager', 'employee']
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - email
+        - role
+    SignupRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum: ['admin', 'manager', 'employee']
+      required:
+        - email
+        - password
+        - role
+    AuthCredentials:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
+    Display:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        location:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - name
+        - location
+    DisplayCreate:
+        type: object
+        properties:
+          name:
+            type: string
+          location:
+            type: string
+        required:
+          - name
+          - location
+    DisplayUpdate:
+        type: object
+        properties:
+          name:
+            type: string
+          location:
+            type: string
+  parameters:
+      ResourceId:
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+          example:
+            error: 'Resource not found'
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+          example:
+            error: 'Authentication required'
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+          example:
+            error: 'Insufficient permissions'
+    InvalidUserInput:
+      description: Invalid input data
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+          example:
+            error: 'Invalid input data'
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
