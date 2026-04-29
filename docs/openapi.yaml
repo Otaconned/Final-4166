@@ -55,6 +55,8 @@ paths:
                 createdAt: '2024-01-01T00:00:00Z'
         '400':
           $ref: '#/components/responses/InvalidUserInput'
+        '409':
+          $ref: '#/components/responses/DuplicationError'
   /api/auth/login:
     post:
       tags:
@@ -83,8 +85,6 @@ paths:
                 token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
         '400':
           $ref: '#/components/responses/InvalidUserInput'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
 
   /api/displays:
     get:
@@ -286,6 +286,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DisplayItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '400':
           $ref: '#/components/responses/InvalidUserInput'
         '403':
@@ -354,6 +356,8 @@ paths:
                 $ref: '#/components/schemas/Comment'
         '400':
           $ref: '#/components/responses/InvalidUserInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
   
@@ -372,6 +376,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
     put:
@@ -649,6 +655,17 @@ components:
                 type: string
           example:
             error: 'Invalid input data'
+    DuplicationError:
+      description: Resource already exists
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+          example:
+            error: 'Resource already in use'
   securitySchemes:
     BearerAuth:
       type: http
