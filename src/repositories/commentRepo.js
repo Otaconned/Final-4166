@@ -16,7 +16,7 @@ export async function getAll({ displayId, limit, userId, userRole }) {
         if (displayId && !displayIds.includes(parseInt(displayId))) return [];
     }
 
-const comments = await prisma.comment.findMany({
+const comments = await prisma.displayComment.findMany({
     where,
     include: {
         author: { select: { email: true } },
@@ -30,7 +30,7 @@ return comments;
 }
 
 export async function getById(id) {
-    const comment = await prisma.comment.findUnique({
+    const comment = await prisma.displayComment.findUnique({
         where: { id },
         include: {
             author: { select: { email: true } },
@@ -42,14 +42,14 @@ export async function getById(id) {
 }
 
 export async function create(commentData) {
-    return prisma.comment.create({
+    return prisma.displayComment.create({
         data: commentData,
     });
 }
 
 export async function update(id, updatedData) {
     try {
-        const updatedComment = await prisma.comment.update({
+        const updatedComment = await prisma.displayComment.update({
             where: { id },
             data: updatedData,
         });
@@ -62,7 +62,7 @@ export async function update(id, updatedData) {
 
 export async function remove(id) {
     try {
-        const deletedComment = await prisma.comment.delete({
+        const deletedComment = await prisma.displayComment.delete({
             where: { id },
         });
         return deletedComment;

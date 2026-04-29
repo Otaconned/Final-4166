@@ -210,7 +210,7 @@ paths:
           required: false
           schema:
             type: string
-            enum: ['active', 'out_of_stock', 'archived']
+            enum: ['available', 'out_of_stock']
       responses:
         '200':
           description: A list of display items
@@ -477,6 +477,9 @@ components:
           type: string
         location:
           type: string
+        status:
+          type: string
+          enum: ['active', 'archived']
         createdAt:
           type: string
           format: date-time
@@ -500,6 +503,9 @@ components:
             type: string
           location:
             type: string
+          status:
+            type: string
+            enum: ['active', 'archived']
     DisplayItem:
       type: object
       properties:
@@ -516,7 +522,7 @@ components:
           type: string
         status:
           type: string
-          enum: ['active', 'out_of_stock', 'archived']
+          enum: ['active', 'out_of_stock']
         createdAt:
           type: string
           format: date-time
@@ -535,7 +541,7 @@ components:
           type: string
         status:
           type: string
-          enum: ['active', 'out_of_stock', 'archived']
+          enum: ['active', 'out_of_stock']
         location:
           type: string
         displayId:
@@ -549,7 +555,7 @@ components:
           type: string
         status:
           type: string
-          enum: ['active', 'out_of_stock', 'archived']
+          enum: ['active', 'out_of_stock']
         quantity:
           type: integer
         location:
