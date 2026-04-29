@@ -126,8 +126,6 @@ paths:
           $ref: '#/components/responses/InvalidUserInput'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
           
   /api/displays/{id}:
     get:
@@ -286,6 +284,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DisplayItem'
+        '400':
+          $ref: '#/components/responses/InvalidUserInput'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
@@ -300,6 +300,8 @@ paths:
       responses:
         '204':
           description: Display item deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
@@ -346,6 +348,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/InvalidUserInput'
         '404':
           $ref: '#/components/responses/NotFound'
   
@@ -363,6 +367,8 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - content
               properties:
                 content:
                   type: string
@@ -373,8 +379,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/InvalidUserInput'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
     delete:
       tags:
         - Comments
@@ -385,8 +397,12 @@ paths:
       responses:
         '204':
           description: Comment deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
 components:
   schemas:
@@ -464,6 +480,97 @@ components:
             type: string
           location:
             type: string
+    DisplayItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        plu:
+          type: string
+        displayId:
+          type: integer
+        location:
+          type: string
+        productName:
+          type: string
+        status:
+          type: string
+          enum: ['active', 'out_of_stock', 'archived']
+        createdAt:
+          type: string
+          format: date-time
+        authorId:
+          type: integer
+    DisplayItemCreate:
+      type: object
+      required:
+        - productName
+        - plu
+        - displayId
+      properties:
+        productName:
+          type: string
+        plu:
+          type: string
+        status:
+          type: string
+          enum: ['active', 'out_of_stock', 'archived']
+        location:
+          type: string
+        displayId:
+          type: integer
+    DisplayItemUpdate:
+      type: object
+      properties:
+        productName:
+          type: string
+        plu:
+          type: string
+        status:
+          type: string
+          enum: ['active', 'out_of_stock', 'archived']
+        quantity:
+          type: integer
+        location:
+          type: string
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        content:
+          type: string
+        authorId:
+          type: integer
+        displayId:
+          type: integer
+        displayItemId:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        actionType:
+          type: string
+          enum: ['note', 'add', 'remove', 'update']
+    CommentCreate:
+      type: object
+      required:
+        - content
+        - displayId
+      properties:
+        content:
+          type: string
+        displayId:
+          type: integer
+        displayItemId:
+          type: integer
+          nullable: true
+        actionType:
+          type: string
+          enum: ['note', 'add', 'remove', 'update']
+
   parameters:
       ResourceId:
         name: id
