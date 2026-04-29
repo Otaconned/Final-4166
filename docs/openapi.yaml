@@ -354,6 +354,22 @@ paths:
           $ref: '#/components/responses/NotFound'
   
   /api/comments/{id}:
+    get:
+      tags:
+        - Comments
+      summary: Get comment details
+      description: Retrieve detailed information about a specific comment
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Comment details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '404':
+          $ref: '#/components/responses/NotFound'
     put:
       tags:
         - Comments
